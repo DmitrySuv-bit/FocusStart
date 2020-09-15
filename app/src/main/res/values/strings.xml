@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">exchangeRates</string>
+    <string name="textValue">Курс на сегодня: </string>
+    <string name="textPrevious">Предыдущий курс: </string>
+    <string name="textUpdated">Обновлено: </string>
+    <string name="update">Обновить</string>
+    <string name="convertButton">Конвертирование валют</string>
+    <string name="textCourseDate">Курс валют на</string>
+</resources>
