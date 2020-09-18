@@ -2,16 +2,16 @@ package com.example.exchange_rates;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
 public class DownloadJson {
-    public String getTextJson() throws IOException {
-        BufferedReader br;
+    public String getJsonText(String inputUrl) throws IOException {
+        StringBuilder jsonText = new StringBuilder();
 
-        URL url = new URL("https://www.cbr-xml-daily.ru/daily_json.js");
+        URL url = new URL(inputUrl);
+
         HttpURLConnection httpConn = (HttpURLConnection) url.openConnection();
 
         httpConn.setAllowUserInteraction(false);
@@ -23,18 +23,16 @@ public class DownloadJson {
 
         if (resCode == HttpURLConnection.HTTP_OK) {
 
-            br = new BufferedReader(new InputStreamReader(httpConn.getInputStream()));
+            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(httpConn.getInputStream()));
 
-            StringBuilder sb = new StringBuilder();
-            String s;
-            while ((s = br.readLine()) != null) {
-                sb.append(s);
-                sb.append("\n");
+            String line;
+            while ((line = bufferedReader.readLine()) != null) {
+                jsonText.append(line);
             }
-
-            return sb.toString();
-        } else {
-            return null;
         }
+
+
+
+        return jsonText.toString();
     }
 }

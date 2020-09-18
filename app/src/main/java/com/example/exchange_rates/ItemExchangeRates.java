@@ -1,6 +1,6 @@
 package com.example.exchange_rates;
 
-public class ItemCurrency {
+public class ItemExchangeRates {
     private String charCode;
     private String name;
     private String value;

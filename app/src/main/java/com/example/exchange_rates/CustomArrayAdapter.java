@@ -12,11 +12,11 @@ import androidx.annotation.Nullable;
 
 import java.util.List;
 
-public class CustomArrayAdapter extends ArrayAdapter<ItemCurrency> {
+public class CustomArrayAdapter extends ArrayAdapter<ItemExchangeRates> {
     private LayoutInflater inflater;
-    private List<ItemCurrency> listItem;
+    private List<ItemExchangeRates> listItem;
 
-    public CustomArrayAdapter(@NonNull Context context, int resource, List<ItemCurrency> listItem, LayoutInflater inflater) {
+    public CustomArrayAdapter(@NonNull Context context, int resource, List<ItemExchangeRates> listItem, LayoutInflater inflater) {
         super(context, resource, listItem);
         this.inflater = inflater;
         this.listItem = listItem;
@@ -26,7 +26,7 @@ public class CustomArrayAdapter extends ArrayAdapter<ItemCurrency> {
     @Override
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
         ViewHolder viewHolder;
-        ItemCurrency listItemMain = listItem.get(position);
+        ItemExchangeRates listItemMain = listItem.get(position);
         if(convertView == null){
             convertView = inflater.inflate(R.layout.list_item, null, false);
             viewHolder = new ViewHolder();

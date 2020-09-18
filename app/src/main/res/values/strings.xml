@@ -3,7 +3,8 @@
     <string name="textValue">Курс на сегодня: </string>
     <string name="textPrevious">Предыдущий курс: </string>
     <string name="textUpdated">Обновлено: </string>
-    <string name="update">Обновить</string>
-    <string name="convertButton">Конвертирование валют</string>
-    <string name="textCourseDate">Курс валют на</string>
+    <string name="updateButton">Обновить</string>
+    <string name="textCourseDate">Курс валют на: </string>
+    <string name="conversion_text1">Введите значение в рублях</string>
+    <string name="conversion_text2">Значение после конвертации</string>
 </resources>
