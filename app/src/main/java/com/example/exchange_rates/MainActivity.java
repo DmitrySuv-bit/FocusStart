@@ -61,26 +61,11 @@ public class MainActivity extends AppCompatActivity {
         textUpdated = findViewById(R.id.textUpdated);
         textCoursesDate = findViewById(R.id.textCoursesDate);
 
-        if (savedInstanceState == null) {
-            String text = readFile(JSON_TEXT_FILE);
-
-            if (!text.equals("")) {
-                parsgJson(text);
-
-                jsonText = text;
-
-                textUpdated.setText(readFile(UPDATE_TEXT_FILE));
-            }else {
-                init();
-            }
-
-        }
 
         listItemsExchangeRates = new ArrayList<>();
+
         adapter = new CustomArrayAdapter(this, R.layout.list_item, listItemsExchangeRates, getLayoutInflater());
         listView.setAdapter(adapter);
-
-
         // Обработчик на Item List view
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -97,9 +82,40 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 init();
+                writeFile(jsonText, JSON_TEXT_FILE);
+                writeFile(textUpdated.getText().toString(), UPDATE_TEXT_FILE);
             }
         });
 
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+
+        String text = readFile(JSON_TEXT_FILE);
+
+        if (!text.equals("")) {
+            parsgJson(text);
+
+            jsonText = text;
+
+            textUpdated.setText(readFile(UPDATE_TEXT_FILE));
+        } else {
+            init();
+        }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+        if (jsonText != null) {
+            writeFile(jsonText, JSON_TEXT_FILE);
+        }
+
+        writeFile(textUpdated.getText().toString(), UPDATE_TEXT_FILE);
     }
 
     @Override
@@ -112,6 +128,8 @@ public class MainActivity extends AppCompatActivity {
         String up = textUpdated.getText().toString();
 
         outState.putString("up", up);
+
+
     }
 
     @Override
@@ -148,8 +166,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initWithTimer() {
-        init();
-
         new CountDownTimer(5000, 1000) {
             @Override
             public void onTick(long millisUntilFinished) {
@@ -157,6 +173,8 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onFinish() {
+
+                init();
                 initWithTimer();
             }
         }.start();
@@ -199,19 +217,16 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void run() {
                 ParsingJson parsingJson = new ParsingJson();
-                if (listItemsExchangeRates != null){
+                if (listItemsExchangeRates != null) {
                     listItemsExchangeRates.clear();
                     try {
 
-                        listItemsExchangeRates.addAll(parsingJson.parseJson(text)) ;
+                        listItemsExchangeRates.addAll(parsingJson.parseJson(text));
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
                     coursesDate = parsingJson.getDate();
                 }
-
-
-
 
 
                 runOnUiThread(new Runnable() {
@@ -232,15 +247,6 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-   @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        if (jsonText != null) {
-            writeFile(jsonText, JSON_TEXT_FILE);
-        }
-
-        writeFile(textUpdated.getText().toString(), UPDATE_TEXT_FILE);
-    }
 
     public void writeFile(String text, String nameFile) {
         try {

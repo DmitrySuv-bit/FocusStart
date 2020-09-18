@@ -1,6 +1,7 @@
 package com.example.exchange_rates;
 
 import android.content.Context;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,7 +29,7 @@ public class CustomArrayAdapter extends ArrayAdapter<ItemExchangeRates> {
         ViewHolder viewHolder;
         ItemExchangeRates listItemMain = listItem.get(position);
         if(convertView == null){
-            convertView = inflater.inflate(R.layout.list_item, null, false);
+            convertView = inflater.inflate(R.layout.list_item, null, true);
             viewHolder = new ViewHolder();
 
 
