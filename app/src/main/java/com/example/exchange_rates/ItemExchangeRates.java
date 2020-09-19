@@ -10,13 +10,6 @@ public class ItemExchangeRates {
 
     }
 
-    public ItemExchangeRates(String charCode, String name, String value, String previous) {
-        this.charCode = charCode;
-        this.name = name;
-        this.value = value;
-        this.previous = previous;
-    }
-
     public String getCharCode() {
         return charCode;
     }
