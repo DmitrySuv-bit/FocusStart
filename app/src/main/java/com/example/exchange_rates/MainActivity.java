@@ -170,19 +170,18 @@ public class MainActivity extends AppCompatActivity {
 
     private void init() {
         if (checkInternetConnection()) {
-        runnable = new Runnable() {
-            @Override
-            public void run() {
-
+            runnable = new Runnable() {
+                @Override
+                public void run() {
                     DownloadJson downloadJson = new DownloadJson();
 
                     exchangeRatesText = downloadJson.getJsonText(URL);
 
                     parsingJson(exchangeRatesText);
+                }
+            };
+        }
 
-            }
-        };
-    }
         secondThread = new Thread(runnable);
         secondThread.start();
 
@@ -198,7 +197,7 @@ public class MainActivity extends AppCompatActivity {
                 if (exchangeRatesListItems != null) {
                     exchangeRatesListItems.clear();
 
-                        exchangeRatesListItems.addAll(parsingJson.parseJson(text));
+                    exchangeRatesListItems.addAll(parsingJson.parseJson(text));
 
                     coursesDate = parsingJson.getExchangeRatesDate();
                 }
@@ -218,7 +217,7 @@ public class MainActivity extends AppCompatActivity {
         secondThread.start();
     }
 
-    public void writeFile(String text, String nameFile) {
+    private void writeFile(String text, String nameFile) {
         try {
             BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(openFileOutput(nameFile,
                     MODE_PRIVATE)));
@@ -233,7 +232,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public String readFile(String nameFile) {
+    private String readFile(String nameFile) {
         StringBuilder text = new StringBuilder();
         try {
             BufferedReader br = new BufferedReader(new InputStreamReader(

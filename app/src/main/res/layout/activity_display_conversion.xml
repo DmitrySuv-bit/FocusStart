@@ -56,7 +56,7 @@
         android:layout_marginTop="16dp"
         android:background="#ABE4F6"
         android:padding="5dp"
-        android:text="@string/convertButton"
+        android:text="@string/convert_button"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
@@ -73,7 +73,7 @@
         android:hint="@string/conversion_text1"
         android:inputType="numberDecimal"
         android:padding="10dp"
-        android:textSize="20sp"
+        android:textSize="24sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/currencyName" />
