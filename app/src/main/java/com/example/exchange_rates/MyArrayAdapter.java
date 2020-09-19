@@ -1,7 +1,6 @@
 package com.example.exchange_rates;
 
 import android.content.Context;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,11 +12,11 @@ import androidx.annotation.Nullable;
 
 import java.util.List;
 
-public class CustomArrayAdapter extends ArrayAdapter<ItemExchangeRates> {
+public class MyArrayAdapter extends ArrayAdapter<ItemExchangeRates> {
     private LayoutInflater inflater;
     private List<ItemExchangeRates> listItem;
 
-    public CustomArrayAdapter(@NonNull Context context, int resource, List<ItemExchangeRates> listItem, LayoutInflater inflater) {
+    public MyArrayAdapter(@NonNull Context context, int resource, List<ItemExchangeRates> listItem, LayoutInflater inflater) {
         super(context, resource, listItem);
         this.inflater = inflater;
         this.listItem = listItem;
@@ -27,14 +26,15 @@ public class CustomArrayAdapter extends ArrayAdapter<ItemExchangeRates> {
     @Override
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
         ViewHolder viewHolder;
+
         ItemExchangeRates listItemMain = listItem.get(position);
-        if(convertView == null){
-            convertView = inflater.inflate(R.layout.list_item, null, true);
+
+        if (convertView == null) {
             viewHolder = new ViewHolder();
 
+            convertView = inflater.inflate(R.layout.list_item, null, true);
 
             viewHolder.charCode = convertView.findViewById(R.id.textViewCharCode);
-
             viewHolder.name = convertView.findViewById(R.id.textViewName);
             viewHolder.value = convertView.findViewById(R.id.textViewValue);
             viewHolder.previous = convertView.findViewById(R.id.textViewPrevious);
@@ -48,10 +48,10 @@ public class CustomArrayAdapter extends ArrayAdapter<ItemExchangeRates> {
         viewHolder.value.setText(listItemMain.getValue());
         viewHolder.previous.setText(listItemMain.getPrevious());
 
-
         return convertView;
     }
-    private static class ViewHolder{
+
+    private static class ViewHolder {
         TextView charCode;
         TextView name;
         TextView value;

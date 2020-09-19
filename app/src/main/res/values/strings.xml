@@ -1,10 +1,12 @@
 <resources>
     <string name="app_name">exchangeRates</string>
-    <string name="textValue">Курс на сегодня: </string>
+    <string name="textValue">Текущий курс: </string>
     <string name="textPrevious">Предыдущий курс: </string>
     <string name="textUpdated">Обновлено: </string>
     <string name="updateButton">Обновить</string>
     <string name="textCourseDate">Курс валют на: </string>
     <string name="conversion_text1">Введите значение в рублях</string>
-    <string name="conversion_text2">Значение после конвертации</string>
+    <string name="conversion_text2">Сумма в выбранной валюте</string>
+    <string name="convertButton">Конвертировать</string>
+    <string name="conversion_hint">Для конвертации нажмите на интересующию валюту</string>
 </resources>

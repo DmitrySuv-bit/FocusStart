@@ -32,78 +32,93 @@ public class MainActivity extends AppCompatActivity {
     public static final String EXTRA_NAME_CURRENCY = "com.example.exchange_rates.NAME_CURRENCY";
     public static final String EXTRA_VALUE_CURRENCY = "com.example.exchange_rates.NAME_VALUE";
     public static final String URL = "https://www.cbr-xml-daily.ru/daily_json.js";
-    public static final String TEXT = "com.example.exchange_rates.TEXT";
-    public static final String JSON_TEXT_FILE = "json_text.txt";
-    public static final String UPDATE_TEXT_FILE = "UPDETE_text.txt";
+    public static final String JSON_TEXT = "com.example.exchange_rates.JSON_TEXT";
+    public static final String UPDATE_TEXT = "com.example.exchange_rates.UPDATE_TEXT";
+    public static final String JSON_TEXT_FILE_NAME = "json_text.txt";
+    public static final String UPDATE_TEXT_FILE_NAME = "UPDETE_text.txt";
 
-    private ListView listView;
-    private Button buttonUpdate;
-    private TextView textUpdated;
-    private List<ItemExchangeRates> listItemsExchangeRates;
+    private TextView updatedText;
+    private List<ItemExchangeRates> exchangeRatesListItems;
     private TextView textCoursesDate;
-    private CustomArrayAdapter adapter;
+    private MyArrayAdapter adapter;
     private String coursesDate;
-    private String jsonText;
-
-
+    private String exchangeRatesText;
     private Thread secondThread;
     private Runnable runnable;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-
-        listView = findViewById(R.id.listView);
-        buttonUpdate = findViewById(R.id.buttonUpdate);
-        textUpdated = findViewById(R.id.textUpdated);
+        ListView listView = findViewById(R.id.listView);
+        Button updateButton = findViewById(R.id.buttonUpdate);
+        updatedText = findViewById(R.id.textUpdated);
         textCoursesDate = findViewById(R.id.textCoursesDate);
 
+        exchangeRatesListItems = new ArrayList<>();
 
-        listItemsExchangeRates = new ArrayList<>();
 
-        adapter = new CustomArrayAdapter(this, R.layout.list_item, listItemsExchangeRates, getLayoutInflater());
+        if (savedInstanceState == null) {
+            String text = readFile(JSON_TEXT_FILE_NAME);
+
+            if (text.length() != 0) {
+                parsingJson(text);
+
+                exchangeRatesText = text;
+                updatedText.setText(readFile(UPDATE_TEXT_FILE_NAME));
+            } else {
+                init();
+            }
+        }
+
+        initWithTimer();
+
+        adapter = new MyArrayAdapter(this, R.layout.list_item,
+                exchangeRatesListItems, getLayoutInflater());
+
         listView.setAdapter(adapter);
-        // Обработчик на Item List view
+
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                String exchangeRatesName = listItemsExchangeRates.get(position).getName();
-                String exchangeRatesValue = listItemsExchangeRates.get(position).getValue();
+                String exchangeRatesName = exchangeRatesListItems.get(position).getName();
+                String exchangeRatesValue = exchangeRatesListItems.get(position).getValue();
 
                 openDisplayConversion(exchangeRatesName, exchangeRatesValue);
             }
         });
 
-        //Обработчик кнопки обновить
-        buttonUpdate.setOnClickListener(new View.OnClickListener() {
+        updateButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 init();
-                writeFile(jsonText, JSON_TEXT_FILE);
-                writeFile(textUpdated.getText().toString(), UPDATE_TEXT_FILE);
+                writeFile(exchangeRatesText, JSON_TEXT_FILE_NAME);
+                writeFile(updatedText.getText().toString(), UPDATE_TEXT_FILE_NAME);
             }
         });
-
     }
 
     @Override
-    protected void onStart() {
-        super.onStart();
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
 
+        outState.putString(JSON_TEXT, exchangeRatesText);
 
-        String text = readFile(JSON_TEXT_FILE);
+        outState.putString(UPDATE_TEXT, updatedText.getText().toString());
+    }
 
-        if (!text.equals("")) {
-            parsgJson(text);
+    @Override
+    protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
 
-            jsonText = text;
+        String text = savedInstanceState.getString(JSON_TEXT);
 
-            textUpdated.setText(readFile(UPDATE_TEXT_FILE));
-        } else {
-            init();
+        if (text != null) {
+            parsingJson(text);
+
+            exchangeRatesText = text;
+            updatedText.setText(savedInstanceState.getString(UPDATE_TEXT));
         }
     }
 
@@ -111,48 +126,17 @@ public class MainActivity extends AppCompatActivity {
     protected void onStop() {
         super.onStop();
 
-        if (jsonText != null) {
-            writeFile(jsonText, JSON_TEXT_FILE);
+        if (exchangeRatesText != null) {
+            writeFile(exchangeRatesText, JSON_TEXT_FILE_NAME);
         }
 
-        writeFile(textUpdated.getText().toString(), UPDATE_TEXT_FILE);
+        writeFile(updatedText.getText().toString(), UPDATE_TEXT_FILE_NAME);
     }
 
-    @Override
-    protected void onSaveInstanceState(@NonNull Bundle outState) {
-        super.onSaveInstanceState(outState);
-
-        outState.putString(TEXT, jsonText);
-
-
-        String up = textUpdated.getText().toString();
-
-        outState.putString("up", up);
-
-
-    }
-
-    @Override
-    protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
-        super.onRestoreInstanceState(savedInstanceState);
-
-        String text = savedInstanceState.getString(TEXT);
-
-        if (text != null) {
-            parsgJson(text);
-
-            jsonText = text;
-
-            textUpdated.setText(savedInstanceState.getString("up"));
-        }
-
-    }
-
-    //Переход к Activity display conversion
-    private void openDisplayConversion(String nameExchangeRates, String exchangeRatesValue) {
+    private void openDisplayConversion(String exchangeRatesName, String exchangeRatesValue) {
         Intent intent = new Intent(this, DisplayConversionActivity.class);
 
-        intent.putExtra(EXTRA_NAME_CURRENCY, nameExchangeRates);
+        intent.putExtra(EXTRA_NAME_CURRENCY, exchangeRatesName);
         intent.putExtra(EXTRA_VALUE_CURRENCY, exchangeRatesValue);
 
         startActivity(intent);
@@ -161,73 +145,67 @@ public class MainActivity extends AppCompatActivity {
     private String getCurrentTime() {
         Date currentDate = new Date();
 
-        DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy / HH:mm:ss", Locale.getDefault());
+        DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy / HH:mm:ss",
+                Locale.getDefault());
         return dateFormat.format(currentDate);
     }
 
     private void initWithTimer() {
-        new CountDownTimer(5000, 1000) {
+        new CountDownTimer(60000, 1000) {
             @Override
             public void onTick(long millisUntilFinished) {
             }
 
             @Override
             public void onFinish() {
-
                 init();
                 initWithTimer();
+
+                writeFile(exchangeRatesText, JSON_TEXT_FILE_NAME);
+                writeFile(updatedText.getText().toString(), UPDATE_TEXT_FILE_NAME);
             }
         }.start();
     }
 
     private void init() {
-
         runnable = new Runnable() {
             @Override
             public void run() {
-                getRatesJson();
+                try {
+                    DownloadJson downloadJson = new DownloadJson();
+
+                    exchangeRatesText = downloadJson.getJsonText(URL);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                parsingJson(exchangeRatesText);
             }
         };
 
         secondThread = new Thread(runnable);
         secondThread.start();
 
-        textUpdated.setText(getCurrentTime());
+        updatedText.setText(getCurrentTime());
     }
 
-    private void getRatesJson() {
-
-        try {
-            DownloadJson downloadJson = new DownloadJson();
-
-            jsonText = downloadJson.getJsonText(URL);
-
-
-        } catch (IOException e) {
-            e.printStackTrace();
-
-        }
-
-        parsgJson(jsonText);
-
-    }
-
-    private void parsgJson(final String text) {
+    private void parsingJson(final String text) {
         runnable = new Runnable() {
             @Override
             public void run() {
                 ParsingJson parsingJson = new ParsingJson();
-                if (listItemsExchangeRates != null) {
-                    listItemsExchangeRates.clear();
-                    try {
 
-                        listItemsExchangeRates.addAll(parsingJson.parseJson(text));
+                if (exchangeRatesListItems != null) {
+                    exchangeRatesListItems.clear();
+
+                    try {
+                        exchangeRatesListItems.addAll(parsingJson.parseJson(text));
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
+
                     coursesDate = parsingJson.getDate();
                 }
-
 
                 runOnUiThread(new Runnable() {
                     @Override
@@ -238,25 +216,20 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
             }
-
         };
 
         secondThread = new Thread(runnable);
         secondThread.start();
-
-
     }
-
 
     public void writeFile(String text, String nameFile) {
         try {
-            // отрываем поток для записи
-            BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(openFileOutput(nameFile, MODE_PRIVATE)));
-            // пишем данные
+            BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(openFileOutput(nameFile,
+                    MODE_PRIVATE)));
+
             bw.write(text);
-            // закрываем поток
+
             bw.close();
-            Log.e(STORAGE_SERVICE, "Файл записан");
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -267,23 +240,21 @@ public class MainActivity extends AppCompatActivity {
     public String readFile(String nameFile) {
         StringBuilder text = new StringBuilder();
         try {
-
-            // открываем поток для чтения
             BufferedReader br = new BufferedReader(new InputStreamReader(
                     openFileInput(nameFile)));
+
             String line;
-            // читаем содержимое
             while ((line = br.readLine()) != null) {
                 text.append(line);
-                Log.d(STORAGE_SERVICE, line);
             }
+
+            br.close();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
+
         return text.toString();
     }
-
-
 }
