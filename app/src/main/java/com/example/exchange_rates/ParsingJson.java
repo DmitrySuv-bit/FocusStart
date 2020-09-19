@@ -8,35 +8,39 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ParsingJson {
-    String date;
+    String exchangeRatesDate;
 
-    public String getDate() {
-        return date.substring(0, 10);
+    public String getExchangeRatesDate() {
+        return exchangeRatesDate.substring(0, 10);
     }
 
-    public List<ItemExchangeRates> parseJson(String jsonText)  throws JSONException {
+    public List<ItemExchangeRates> parseJson(String jsonText) {
         List<ItemExchangeRates> list = new ArrayList<>();
 
-        JSONObject jsonObject = new JSONObject(jsonText);
+        try {
+            JSONObject jsonObject = new JSONObject(jsonText);
 
-        date = jsonObject.getString("Date");
+            exchangeRatesDate = jsonObject.getString("Date");
+            JSONObject currenciesObject = jsonObject.getJSONObject("Valute");
 
-        JSONObject currenciesObject = jsonObject.getJSONObject("Valute");
+            JSONArray currencyNamesArray = currenciesObject.names();
 
-        JSONArray currencyNamesArray = currenciesObject.names();
+            if (currencyNamesArray != null) {
+                for (int i = 0; i < currencyNamesArray.length(); ++i) {
+                    ItemExchangeRates item = new ItemExchangeRates();
 
-        if (currencyNamesArray != null) {
-            for (int i = 0; i < currencyNamesArray.length(); ++i) {
-                ItemExchangeRates item = new ItemExchangeRates();
+                    item.setCharCode(currenciesObject.getJSONObject(currencyNamesArray.getString(i)).getString("CharCode"));
+                    item.setName(currenciesObject.getJSONObject(currencyNamesArray.getString(i)).getString("Name"));
+                    item.setValue(Double.toString(currenciesObject.getJSONObject(currencyNamesArray.getString(i)).getDouble("Value")));
+                    item.setPrevious(Double.toString(currenciesObject.getJSONObject(currencyNamesArray.getString(i)).getDouble("Previous")));
 
-                item.setCharCode(currenciesObject.getJSONObject(currencyNamesArray.getString(i)).getString("CharCode"));
-                item.setName(currenciesObject.getJSONObject(currencyNamesArray.getString(i)).getString("Name"));
-                item.setValue(Double.toString(currenciesObject.getJSONObject(currencyNamesArray.getString(i)).getDouble("Value")));
-                item.setPrevious(Double.toString(currenciesObject.getJSONObject(currencyNamesArray.getString(i)).getDouble("Previous")));
-
-                list.add(item);
+                    list.add(item);
+                }
             }
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
+
         return list;
     }
 }

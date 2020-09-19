@@ -3,17 +3,18 @@ package com.example.exchange_rates;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.CountDownTimer;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
-
-import org.json.JSONException;
+import android.widget.Toast;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -168,21 +169,20 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void init() {
+        if (checkInternetConnection()) {
         runnable = new Runnable() {
             @Override
             public void run() {
-                try {
+
                     DownloadJson downloadJson = new DownloadJson();
 
                     exchangeRatesText = downloadJson.getJsonText(URL);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
 
-                parsingJson(exchangeRatesText);
+                    parsingJson(exchangeRatesText);
+
             }
         };
-
+    }
         secondThread = new Thread(runnable);
         secondThread.start();
 
@@ -198,13 +198,9 @@ public class MainActivity extends AppCompatActivity {
                 if (exchangeRatesListItems != null) {
                     exchangeRatesListItems.clear();
 
-                    try {
                         exchangeRatesListItems.addAll(parsingJson.parseJson(text));
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
 
-                    coursesDate = parsingJson.getDate();
+                    coursesDate = parsingJson.getExchangeRatesDate();
                 }
 
                 runOnUiThread(new Runnable() {
@@ -256,5 +252,35 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return text.toString();
+    }
+
+    private boolean checkInternetConnection() {
+        ConnectivityManager connManager =
+                (ConnectivityManager) this.getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        NetworkInfo networkInfo = connManager.getActiveNetworkInfo();
+
+        if (networkInfo == null) {
+            Toast.makeText(this, "No default network is currently active",
+                    Toast.LENGTH_LONG).show();
+
+            return false;
+        }
+
+        if (!networkInfo.isConnected()) {
+            Toast.makeText(this, "Network is not connected",
+                    Toast.LENGTH_LONG).show();
+
+            return false;
+        }
+
+        if (!networkInfo.isAvailable()) {
+            Toast.makeText(this, "Network not available",
+                    Toast.LENGTH_LONG).show();
+
+            return false;
+        }
+
+        return true;
     }
 }
