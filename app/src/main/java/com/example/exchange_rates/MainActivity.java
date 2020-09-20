@@ -64,7 +64,7 @@ public class MainActivity extends AppCompatActivity {
             String text = readFile(JSON_TEXT_FILE_NAME);
 
             if (text.length() != 0) {
-                parsingJson(text);
+                updateExchangeRatesList(text);
 
                 exchangeRatesText = text;
                 updatedText.setText(readFile(UPDATE_TEXT_FILE_NAME));
@@ -116,7 +116,7 @@ public class MainActivity extends AppCompatActivity {
         String text = savedInstanceState.getString(JSON_TEXT);
 
         if (text != null) {
-            parsingJson(text);
+            updateExchangeRatesList(text);
 
             exchangeRatesText = text;
             updatedText.setText(savedInstanceState.getString(UPDATE_TEXT));
@@ -177,7 +177,7 @@ public class MainActivity extends AppCompatActivity {
 
                     exchangeRatesText = downloadJson.getJsonText(URL);
 
-                    parsingJson(exchangeRatesText);
+                    updateExchangeRatesList(exchangeRatesText);
                 }
             };
         }
@@ -188,7 +188,7 @@ public class MainActivity extends AppCompatActivity {
         updatedText.setText(getCurrentTime());
     }
 
-    private void parsingJson(final String text) {
+    private void updateExchangeRatesList(final String text) {
         runnable = new Runnable() {
             @Override
             public void run() {
